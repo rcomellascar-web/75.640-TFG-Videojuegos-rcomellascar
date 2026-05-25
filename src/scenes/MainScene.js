@@ -6,6 +6,20 @@ export default class MainScene extends Phaser.Scene {
   constructor() {
     super({ key: "MainScene" });
   }
+ 
+  // Precarga de audios
+  preload() {
+    this.load.audio('shoot_pistola', '/assets/audio/pistol.mp3');
+    this.load.audio('shoot_uzi', '/assets/audio/uzi.mp3');
+    this.load.audio('shoot_shotgun', '/assets/audio/shotgun.mp3');
+    this.load.audio('player_hit', '/assets/audio/hit.mp3');
+    this.load.audio('round_start', '/assets/audio/roundstart.mp3');
+    this.load.audio('enemy_hit', '/assets/audio/grr.mp3');
+    this.load.audio('enemy_die', '/assets/audio/enemydie.mp3');
+    this.load.audio('heart_sound', '/assets/audio/heart.mp3'); 
+    this.load.audio('buy_sound', '/assets/audio/compra.mp3'); 
+
+  }
 
   create() {
     //  CONFIGURACIÓN DEL MUNDO
@@ -14,7 +28,6 @@ export default class MainScene extends Phaser.Scene {
     this.physics.world.setBounds(0, 0, worldWidth, worldHeight);
 
     //RELIEVE DEL MAPA
-
     this.add.grid(
       worldWidth / 2,
       worldHeight / 2,
@@ -83,7 +96,6 @@ export default class MainScene extends Phaser.Scene {
       .text(20, 110, `${this.money}$`, {
         fontSize: "24px",
         fill: "#44ff44",
-
         fontStyle: "bold",
       })
       .setScrollFactor(0)
@@ -104,6 +116,7 @@ export default class MainScene extends Phaser.Scene {
       .setOrigin(0.5)
       .setScrollFactor(0)
       .setDepth(10);
+      
     //  JUGADOR
     this.player = this.add.rectangle(
       worldWidth / 2,
@@ -124,8 +137,6 @@ export default class MainScene extends Phaser.Scene {
     this.enemies = this.physics.add.group({ classType: Enemy, maxSize: 250 });
 
     //  SISTEMA DE COLISIONES
-
-    // Colisión entre enemigos
     this.physics.add.collider(this.enemies, this.enemies);
 
     // Proyectil -> Enemigo
@@ -142,7 +153,6 @@ export default class MainScene extends Phaser.Scene {
         if (isDead) {
           //  DINERO POR KILL
           this.money += 5; 
-
           this.score += 10;
           this.enemiesLeftInRound--;
 
@@ -190,7 +200,6 @@ export default class MainScene extends Phaser.Scene {
     this.healthBar.setDepth(11); 
 
     // Recuperación de vida
-
     this.lastDamageTime = 0; 
     this.nextRegenTime = 0; 
 
@@ -214,17 +223,19 @@ export default class MainScene extends Phaser.Scene {
     );
     this.arrowKeys = this.input.keyboard.createCursorKeys();
 
-    //Primera ronda
+    // Sonido de latidos
+    this.heartSound = this.sound.add('heart_sound', { loop: true, volume: 0.6 });
+    this.isHeartbeatPlaying = false;    
+    
     this.nextRound();
   }
 
   nextRound() {
-    // Transición 
     if (this.isRoundTransitioning) return;
     this.isRoundTransitioning = true;
 
-    // Número de ronda
     this.currentRound++;
+    this.sound.play('round_start', { volume: 0.6 });
     console.log(
       `%c INICIANDO RONDA ${this.currentRound} `,
       "background: #222; color: #bada55; font-size: 1.2em",
@@ -232,7 +243,6 @@ export default class MainScene extends Phaser.Scene {
 
     this.roundText.setText("RONDA: " + this.currentRound);
 
-    // Cantidad enemigos
     if (this.currentRound > 1) {
       this.enemiesToSpawn = Math.ceil((this.enemiesToSpawn + 2) * 1.3);
     } else {
@@ -253,7 +263,6 @@ export default class MainScene extends Phaser.Scene {
       .setDepth(100)
       .setScrollFactor(0);
 
-    // Animación del texto
     this.tweens.add({
       targets: announcement,
       alpha: { from: 0, to: 1 },
@@ -274,7 +283,6 @@ export default class MainScene extends Phaser.Scene {
       },
     });
 
-    // Spawn de enemigos
     this.time.delayedCall(7000, () => {
       if (this.isGameOver) return;
 
@@ -312,7 +320,6 @@ export default class MainScene extends Phaser.Scene {
     this.healthBar.fillStyle(0x000000);
     this.healthBar.fillRect(x, y, width, height);
 
-    //Barra salud 
     const healthWidth = (this.playerHP / 20) * width;
 
     if (this.playerHP > 10) {
@@ -329,7 +336,6 @@ export default class MainScene extends Phaser.Scene {
   }
 
   update(time, delta) {
-    // Menús
     if (
       Phaser.Input.Keyboard.JustDown(this.escKey) &&
       !this.isGameOver &&
@@ -346,14 +352,12 @@ export default class MainScene extends Phaser.Scene {
       this.toggleShop();
     }
 
-    
     if (this.isPaused || this.isShopOpen) {
       const pointer = this.input.activePointer;
       if (pointer.primaryDown) {
         const px = pointer.x;
         const py = pointer.y;
 
-        //  TIENDA
         if (this.isShopOpen) {
           if (
             !this.hasUzi &&
@@ -361,6 +365,7 @@ export default class MainScene extends Phaser.Scene {
             this.uziBtn &&
             this.uziBtn.getBounds().contains(px, py)
           ) {
+            this.sound.play('buy_sound', { volume: 0.3 });
             this.money -= 30;
             this.hasUzi = true;
             this.weapons.push("UZI"); 
@@ -373,7 +378,8 @@ export default class MainScene extends Phaser.Scene {
             this.money >= 20 &&
             this.shotgunBtn &&
             this.shotgunBtn.getBounds().contains(px, py)
-          ) {
+          ) { 
+            this.sound.play('buy_sound', { volume: 0.3 });
             this.money -= 20;
             this.hasShotgun = true;
             this.weapons.push("SHOTGUN"); 
@@ -390,7 +396,6 @@ export default class MainScene extends Phaser.Scene {
           }
         }
 
-        // Pausa 
         if (this.isPaused) {
           if (this.resumeBtn && this.resumeBtn.getBounds().contains(px, py)) {
             this.togglePause();
@@ -456,6 +461,7 @@ export default class MainScene extends Phaser.Scene {
         });
       }
     }
+    
     // Cambio de arma 
     if (Phaser.Input.Keyboard.JustDown(this.keyPrev)) {
       this.currentWeaponIndex =
@@ -471,8 +477,34 @@ export default class MainScene extends Phaser.Scene {
       this.weaponText.setText("ARMA: " + this.weapons[this.currentWeaponIndex]);
     }
 
+    
     this.handleShooting(time);
     this.handleBulletRecycle();
+    // Lógica de latidos
+   const debaSonar = this.playerHP > 0 && this.playerHP <= 10 && !this.isPaused && !this.isShopOpen && !this.isGameOver;
+
+    if (debaSonar) {
+      if (!this.isHeartbeatPlaying) {
+        this.heartSound.play();
+        this.isHeartbeatPlaying = true;
+      }
+
+      let volumenObjetivo = 0.1; // Volumen cuando la vida esta en amarillo
+
+      if (this.playerHP <= 5) {
+        volumenObjetivo = 0.7;    // Volumen cuando la vida esta en rojo
+      }
+
+      if (this.heartSound.volume !== volumenObjetivo) {
+        this.heartSound.setVolume(volumenObjetivo);
+      }
+
+    } else {
+      if (this.isHeartbeatPlaying) {
+        this.heartSound.stop();
+        this.isHeartbeatPlaying = false;
+      }
+    }
     this.drawHealthBar();
   }
 
@@ -489,7 +521,7 @@ export default class MainScene extends Phaser.Scene {
     let isShooting = false;
     let shootAngle = 0;
 
-    //   Disparo con el ratón 
+    //  Disparo con el ratón 
     if (this.input.activePointer.isDown) {
       isShooting = true;
       shootAngle = Phaser.Math.Angle.Between(
@@ -517,6 +549,17 @@ export default class MainScene extends Phaser.Scene {
     }
 
     if (isShooting && time > this.lastFiredTime) {
+      
+      // Sonido de disparo según el arma
+     
+      if (weapon === "PISTOLA") {
+        this.sound.play('shoot_pistola', { volume: 0.3 });
+      } else if (weapon === "UZI") {
+        this.sound.play('shoot_uzi', { volume: 0.3 }); 
+      } else if (weapon === "SHOTGUN") {
+        this.sound.play('shoot_shotgun', { volume: 0.3 }); 
+      }
+
       if (weapon === "SHOTGUN") {
         this.fireBullet(shootAngle); 
         this.fireBullet(shootAngle + 0.1); 
@@ -561,6 +604,7 @@ export default class MainScene extends Phaser.Scene {
     this.playerHP -= 5;
     this.hpText.setText("VIDA: " + this.playerHP);
     this.lastDamageTime = this.time.now;
+    this.sound.play('player_hit', { volume: 0.6 });
 
     if (this.playerHP <= 0) {
       this.gameOver();
@@ -569,10 +613,8 @@ export default class MainScene extends Phaser.Scene {
 
     this.isInvulnerable = true;
 
-    // Relentización por daño
     this.playerCurrentSpeed = this.playerBaseSpeed * 0.6;
 
-    // Parpadeo
     this.tweens.add({
       targets: this.player,
       alpha: 0.2,
@@ -591,19 +633,20 @@ export default class MainScene extends Phaser.Scene {
   }
 
   togglePause() {
+    if (this.heartSound) {
+      this.heartSound.stop();
+      this.isHeartbeatPlaying = false;
+    }
     this.isPaused = !this.isPaused;
 
     if (this.isPaused) {
       this.physics.world.pause();
       this.tweens.pauseAll();
-
       this.time.paused = true;
-
       this.showPauseMenu();
     } else {
       this.physics.world.resume();
       this.tweens.resumeAll();
-
       this.time.paused = false;
 
       if (this.pauseMenu) {
@@ -618,18 +661,17 @@ export default class MainScene extends Phaser.Scene {
       this.quitBtn = null;
     }
   }
+  
   showPauseMenu() {
     const x = 400;
     const y = 300;
 
-    // Fondo oscuro 
     this.pauseBg = this.add
       .rectangle(400, 300, 800, 600, 0x000000, 0.7)
       .setScrollFactor(0)
       .setDepth(2000)
       .setInteractive();
 
-    // Contenedor principal
     this.pauseMenu = this.add.container(0, 0).setDepth(2001).setScrollFactor(0);
 
     const title = this.add
@@ -640,7 +682,6 @@ export default class MainScene extends Phaser.Scene {
       })
       .setOrigin(0.5);
 
-    // Definir botones
     this.resumeBtn = this.add
       .text(x, y, " REANUDAR ", {
         fontSize: "32px",
@@ -661,7 +702,6 @@ export default class MainScene extends Phaser.Scene {
       .setOrigin(0.5)
       .setInteractive({ useHandCursor: true });
 
-    // Efectos visuales de hover 
     [this.resumeBtn, this.quitBtn].forEach((btn) => {
       btn.on("pointerover", () => btn.setStyle({ fill: "#fff" }));
       btn.on("pointerout", () => {
@@ -674,6 +714,10 @@ export default class MainScene extends Phaser.Scene {
   }
 
   toggleShop() {
+    if (this.heartSound) {
+      this.heartSound.stop();
+      this.isHeartbeatPlaying = false;
+    }
     this.isShopOpen = !this.isShopOpen;
 
     if (this.isShopOpen) {
@@ -768,11 +812,14 @@ export default class MainScene extends Phaser.Scene {
   }
 
   gameOver() {
+    if (this.heartSound) {
+      this.heartSound.stop();
+      this.isHeartbeatPlaying = false;
+    }
     this.isGameOver = true;
     this.physics.pause();
     this.isInvulnerable = false; 
 
-    // Efecto visual de impacto
     this.cameras.main.shake(300, 0.01);
     this.player.setFillStyle(0xff0000); 
 
@@ -832,7 +879,7 @@ export default class MainScene extends Phaser.Scene {
     });
 
     [restartBtn, menuBtn].forEach((btn) => {
-      btn.on("pointerover", () => btn.setStyle({ fill: "#ff0" }));
+      btn.on("pointerover", () => btn.setStyle({ fill: "#ff" }));
       btn.on("pointerout", () => {
         const originalColor = btn === restartBtn ? "#0f0" : "#fff";
         btn.setStyle({ fill: originalColor });

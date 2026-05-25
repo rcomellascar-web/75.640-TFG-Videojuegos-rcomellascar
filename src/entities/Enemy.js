@@ -52,7 +52,9 @@ export default class Enemy extends Phaser.GameObjects.Rectangle {
   receiveDamage(amount) {
     this.hp -= amount;
     this.isStunned = true;
-    
+    if (this.hp > 0) {
+      this.scene.sound.play('enemy_hit', { volume: 0.3 });
+    }
     if (this.body) {
         this.body.setVelocity(0, 0);
         this.body.setImmovable(true); 
@@ -69,6 +71,7 @@ export default class Enemy extends Phaser.GameObjects.Rectangle {
     });
 
     if (this.hp <= 0) {
+        this.scene.sound.play('enemy_die', { volume: 0.3 });
         this.die();
         return true;
     }
