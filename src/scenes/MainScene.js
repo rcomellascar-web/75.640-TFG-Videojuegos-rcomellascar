@@ -179,8 +179,8 @@ export default class MainScene extends Phaser.Scene {
           start: 0,
           end: 7,
         }),
-        frameRate: 10, 
-        repeat: -1, 
+        frameRate: 10,
+        repeat: -1,
       });
     }
     if (!this.anims.exists("player_walk_aim")) {
@@ -189,7 +189,7 @@ export default class MainScene extends Phaser.Scene {
         frames: this.anims.generateFrameNumbers("player_walk_shoot", {
           start: 0,
           end: 5,
-        }), 
+        }),
         frameRate: 10,
         repeat: -1,
       });
@@ -201,9 +201,9 @@ export default class MainScene extends Phaser.Scene {
         frames: this.anims.generateFrameNumbers("player_die_strip", {
           start: 0,
           end: 4,
-        }), 
-        frameRate: 10, 
-        repeat: 0, 
+        }),
+        frameRate: 10,
+        repeat: 0,
       });
     }
     if (!this.anims.exists("player_idle")) {
@@ -212,9 +212,9 @@ export default class MainScene extends Phaser.Scene {
         frames: this.anims.generateFrameNumbers("player_idle_sheet", {
           start: 0,
           end: 6,
-        }), 
-        frameRate: 6, 
-        repeat: -1, 
+        }),
+        frameRate: 6,
+        repeat: -1,
       });
     }
     if (!this.anims.exists("player_shoot_idle")) {
@@ -223,12 +223,11 @@ export default class MainScene extends Phaser.Scene {
         frames: this.anims.generateFrameNumbers("player_shoot_sheet", {
           start: 0,
           end: 3,
-        }), 
+        }),
         frameRate: 12,
-        repeat: -1, 
+        repeat: -1,
       });
     }
-
 
     //  VARIABLES DE ESTADO
     this.score = 0;
@@ -334,22 +333,21 @@ export default class MainScene extends Phaser.Scene {
     this.player.setOffset(50, 56);
     this.physics.add.existing(this.player);
     this.player.setCollideWorldBounds(true);
-   
 
     //  CÁMARA
     this.cameras.main.setBounds(0, 0, worldWidth, worldHeight);
 
     if (this.player) {
-      // 1. Posicionamos al jugador en el centro de las físicas
+      // jugador en el centro de las físicas
       this.player.setPosition(
         margenArribaIzq + physicsWidth / 2,
         margenArribaIzq + physicsHeight / 2,
       );
 
-      // 2. Centramos la cámara de golpe en el jugador para que nazca ahí
+      // Camara centrada en el jugador desde el inicio
       this.cameras.main.centerOn(this.player.x, this.player.y);
 
-      // 3. Activamos el seguimiento suave para el resto de la partida
+      // Seguimiento para el resto de la partida
       this.cameras.main.startFollow(this.player, true, 0.05, 0.05);
     }
 
@@ -402,7 +400,6 @@ export default class MainScene extends Phaser.Scene {
           }
         }
 
-        // Actualizamos el texto en pantalla
         this.moneyText.setText(`${this.money}$`);
         this.scoreText.setText(`PUNTOS: ${this.score}`);
       }
@@ -414,10 +411,8 @@ export default class MainScene extends Phaser.Scene {
       this.enemies,
       (player, enemy) => {
         if (enemy.active && !this.isGameOver) {
-          // Le decimos que toque para la animación
           enemy.estaTocandoAlJugador = true;
 
-          // DAÑO INMEDIATO AL CONTACTO (como lo tenías al principio)
           if (!this.isInvulnerable) {
             this.handlePlayerDamage();
           }
@@ -442,7 +437,7 @@ export default class MainScene extends Phaser.Scene {
           const isDead = purpleEnemy.receiveDamage(5);
 
           if (isDead) {
-            this.money += 10; // Da más dinero matar a este que a uno normal
+            this.money += 10;
             this.score += 25;
             this.enemiesLeftInRound--;
 
@@ -460,13 +455,13 @@ export default class MainScene extends Phaser.Scene {
       },
     );
 
-    // Láser ➔ Enemigos Normales
+    // Láser -> Enemigos Normales
     this.physics.add.overlap(this.rayBullets, this.enemies, (bullet, enemy) => {
       if (bullet.active && enemy.active && !bullet.hitEnemies.has(enemy)) {
-        bullet.hitEnemies.add(enemy); // Lo añadimos a la memoria para no volver a dañarlo
-        this.money += 4; // Dinero por impacto
+        bullet.hitEnemies.add(enemy);
+        this.money += 4;
 
-        const isDead = enemy.receiveDamage(10); // Daño del láser (ej: 10)
+        const isDead = enemy.receiveDamage(10);
 
         if (isDead) {
           this.money += 6;
@@ -485,7 +480,7 @@ export default class MainScene extends Phaser.Scene {
       }
     });
 
-    // Láser ➔ Enemigos Lilas
+    // Láser -> Enemigos Lilas
     this.physics.add.overlap(
       this.rayBullets,
       this.purpleEnemies,
@@ -521,16 +516,16 @@ export default class MainScene extends Phaser.Scene {
       (player, projectile) => {
         if (projectile.active && !this.isInvulnerable && !this.isGameOver) {
           projectile.die();
-          this.handlePlayerDamage(); // Reutiliza tu función de daño que quita 5 HP
+          this.handlePlayerDamage();
         }
       },
     );
 
-    // Colisión: Jugador -> Caja Naranja
+    // Colisión: Jugador -> Modificador
     this.physics.add.overlap(
       this.player,
       this.powerupBoxes,
-      this.collectPowerup, // Función que se ejecutará al tocarla
+      this.collectPowerup,
       null,
       this,
     );
@@ -652,14 +647,12 @@ export default class MainScene extends Phaser.Scene {
 
       let purpleEnemiesToSpawn = 1;
 
-      // 1. Calculamos cuántos lilas tocan esta ronda
+      // Cuántos lilas tocan esta ronda
       if (this.currentRound <= 10) {
         purpleEnemiesToSpawn = this.currentRound;
       } else {
-        // Calculamos el bonus que quieres (+2, +3, +4...)
         const extraEnemies = this.currentRound - 9;
 
-        // Sumamos la ronda actual más el bonus
         purpleEnemiesToSpawn = this.currentRound + extraEnemies;
       }
 
@@ -671,23 +664,16 @@ export default class MainScene extends Phaser.Scene {
       this.purpleEnemies.clear(true, true);
       this.enemyProjectiles.clear(true, true);
 
-      // 2. Sumamos AMBOS tipos de enemigos para que la ronda no acabe antes de tiempo
       this.enemiesLeftInRound = this.enemiesToSpawn + purpleEnemiesToSpawn;
       this.isRoundTransitioning = false;
 
       const spawnDelay = Math.max(100, 600);
 
-      // =======================================================
-      // 🚀 SPAWN RECALIBRADO DENTRO DE LOS NUEVOS LÍMITES
-      // =======================================================
-
-      // Obtenemos los límites físicos reales configurados en el motor
       const worldBounds = this.physics.world.bounds;
       const centroX = worldBounds.x + worldBounds.width / 2;
 
-      // --- SPAWN ENEMIGOS NORMALES ---
+      // SPAWN ENEMIGOS NORMALES
       for (let i = 0; i < this.enemiesToSpawn; i++) {
-        // Nacen en el centro horizontal, y alternan entre el techo y el suelo jugable
         const spawnX = centroX;
         const spawnY = worldBounds.y + 50;
 
@@ -697,27 +683,25 @@ export default class MainScene extends Phaser.Scene {
           let enemy = this.enemies.get();
           if (enemy) {
             enemy.spawn(spawnX, spawnY);
-            enemy.body.setCollideWorldBounds(true); // 👈 AÑADE ESTA LÍNEA
+            enemy.body.setCollideWorldBounds(true);
           }
         });
       }
 
-      // --- SPAWN ENEMIGOS LILAS (Escalable) ---
+      // SPAWN ENEMIGOS LILAS
       for (let j = 0; j < purpleEnemiesToSpawn; j++) {
         this.time.delayedCall(2000 + j * 3500, () => {
           if (this.isGameOver || this.isPaused) return;
 
           let pEnemy = this.purpleEnemies.get();
           if (pEnemy) {
-            // El centro vertical real del área jugable
             const centroY = worldBounds.y + worldBounds.height / 2;
             const randomY = centroY + Phaser.Math.Between(-100, 100);
 
-            // Los hacemos aparecer por la izquierda, a 60px adentro del límite físico
             const spawnX_Lila = worldBounds.x + 60;
 
             pEnemy.spawn(spawnX_Lila, randomY);
-            pEnemy.body.setCollideWorldBounds(true); // 👈 AÑADE ESTA LÍNEA
+            pEnemy.body.setCollideWorldBounds(true);
           }
         });
       }
@@ -766,26 +750,23 @@ export default class MainScene extends Phaser.Scene {
     ) {
       this.toggleShop();
     }
+    // Ataque del enemigo al jugador
     if (!this.isPaused && !this.isGameOver && this.player) {
       this.enemies.getChildren().forEach((enemy) => {
         if (!enemy.active) return;
 
         if (enemy.estaTocandoAlJugador) {
-          // 1. Frenamos al zombi
           enemy.body.setVelocity(0, 0);
 
-          // 2. Reproducimos animación de ataque
           if (this.anims.exists("enemy_attack")) {
             enemy.anims.play("enemy_attack", true);
           }
         } else {
-          // Si no está tocando al jugador, vuelve a caminar
           if (this.anims.exists("enemy_walk")) {
             enemy.anims.play("enemy_walk", true);
           }
         }
 
-        // Apagamos el interruptor para el siguiente frame
         enemy.estaTocandoAlJugador = false;
       });
     }
@@ -797,9 +778,7 @@ export default class MainScene extends Phaser.Scene {
         const py = pointer.y;
 
         if (this.isShopOpen) {
-          // =================================================================
-          // ROW 1: PISTOLA (Siempre adquirida, balas infinitas)
-          // =================================================================
+          //PISTOLA
           if (
             this.money >= 200 &&
             this.weaponUpgrades.PISTOLA.speed < 3 &&
@@ -834,9 +813,7 @@ export default class MainScene extends Phaser.Scene {
             });
           }
 
-          // =================================================================
-          // ROW 2: MINI UZI
-          // =================================================================
+          // MINI UZI
           else if (
             !this.hasUzi &&
             this.money >= 200 &&
@@ -909,9 +886,7 @@ export default class MainScene extends Phaser.Scene {
             });
           }
 
-          // =================================================================
-          // ROW 3: SHOTGUN
-          // =================================================================
+          //SHOTGUN
           else if (
             !this.hasShotgun &&
             this.money >= 300 &&
@@ -984,9 +959,7 @@ export default class MainScene extends Phaser.Scene {
             });
           }
 
-          // =================================================================
-          // ROW 4: RAYGUN
-          // =================================================================
+          //RAYGUN
           else if (
             !this.weapons.includes("RAYGUN") &&
             this.money >= 500 &&
@@ -1060,9 +1033,7 @@ export default class MainScene extends Phaser.Scene {
             });
           }
 
-          // =================================================================
-          // BOTONES GENERALES (Munición total y Salir)
-          // =================================================================
+          //BOTONES ADICIONALES
           else if (
             this.money >= this.ammoCost &&
             (this.ammoUzi < this.getMaxAmmo("UZI") ||
@@ -1141,20 +1112,19 @@ export default class MainScene extends Phaser.Scene {
 
     if (this.keys.left.isDown) {
       this.player.setVelocityX(-200);
-      this.player.setFlipX(true); // Gira el sprite a la izquierda
+      // Gira el sprite a la izquierda
+      this.player.setFlipX(true);
       estaMoviendose = true;
     } else if (this.keys.right.isDown) {
       this.player.setVelocityX(200);
-      this.player.setFlipX(false); // Gira el sprite a la derecha
+      // Gira el sprite a la derecha
+      this.player.setFlipX(false);
       estaMoviendose = true;
     } else {
       this.player.setVelocityX(0);
     }
 
-    // ... lógica de arriba/abajo ...
-
     // CONTROL DE ANIMACIÓN
-    // 1. Recogemos si el jugador está apretando el gatillo en este frame
     const moviendoDerecha = this.player.body.velocity.x > 0;
     const moviendoIzquierda = this.player.body.velocity.x < 0;
     const moviendoArriba = this.player.body.velocity.y < 0;
@@ -1163,8 +1133,6 @@ export default class MainScene extends Phaser.Scene {
     estaMoviendose =
       moviendoDerecha || moviendoIzquierda || moviendoArriba || moviendoAbajo;
 
-    // 2. Definimos qué inputs significan DISPARAR (Clic izquierdo O barra espaciadora, por ejemplo)
-    // Así las flechas quedan libres SOLO para moverte y no colisionan.
     const flechaPulsada =
       this.arrowKeys.left.isDown ||
       this.arrowKeys.right.isDown ||
@@ -1172,40 +1140,30 @@ export default class MainScene extends Phaser.Scene {
       this.arrowKeys.down.isDown;
     const estaDisparando = this.input.activePointer.isDown || flechaPulsada;
     if (estaMoviendose && estaDisparando) {
-      // 🔥 CASO 1: Se mueve Y dispara a la vez -> ¡Tu nuevo sprite!
       this.player.anims.play("player_walk_aim", true);
     } else if (estaMoviendose) {
-      // 🏃 CASO 2: Solo se mueve (Mantenemos tu sistema de Moonwalk con el arma abajo)
-
       // Detectamos hacia dónde se está moviendo físicamente en el eje X
       const moviendoDerecha = this.player.body.velocity.x > 0;
       const moviendoIzquierda = this.player.body.velocity.x < 0;
 
-      // Condición de Moonwalk:
-      // - Si mira a la IZQUIERDA (flipX true) pero se mueve a la DERECHA.
-      // - Si mira a la DERECHA (flipX false) pero se mueve a la IZQUIERDA.
       const haceMoonwalk =
         (this.player.flipX && moviendoDerecha) ||
         (!this.player.flipX && moviendoIzquierda);
 
       if (haceMoonwalk) {
-        // 🔄 Si hace moonwalk, reproducimos los pasos marcha atrás
         this.player.anims.playReverse("caminar_soldado", true);
       } else {
-        // ▶️ Si camina hacia donde mira (o se mueve en vertical), animación normal
         this.player.anims.play("caminar_soldado", true);
       }
     } else if (estaDisparando) {
-      // 💥 CASO 3: Está quieto pero disparando (Arma arriba)
       this.player.anims.play("player_shoot_idle", true);
     } else {
-      // 💤 CASO 4: Ni se mueve ni dispara -> Estado de reposo (Arma abajo)
       this.player.anims.play("player_idle", true);
     }
 
     const enemySpeed = 150;
 
-    // 🧟‍♂️ IA Enemigos Comunes
+    //  IA Enemigos
     this.enemies.getChildren().forEach((enemy) => {
       if (enemy.active) {
         enemy.separate(this.enemies);
@@ -1221,7 +1179,7 @@ export default class MainScene extends Phaser.Scene {
     const purpleEnemySpeedFast = 150;
     const purpleEnemySpeedSlow = 30;
 
-    // 🔮 IA Enemigos Lilas
+    //IA Enemigos
     this.purpleEnemies.getChildren().forEach((pEnemy) => {
       if (pEnemy.active) {
         pEnemy.separate(this.purpleEnemies);
@@ -1234,22 +1192,18 @@ export default class MainScene extends Phaser.Scene {
             this.player.y,
           );
 
-          // 🧠 SISTEMA DE DOBLE UMBRAL (Histéresis)
+          // Borde de la la activación de disparo enemigo lila
           if (pEnemy.isShooting) {
-            // Si ya estaba disparando, solo deja de hacerlo si el jugador se aleja a más de 270
             if (distance > 270) {
               pEnemy.isShooting = false;
             }
           } else {
-            // Si estaba caminando, solo empieza a disparar si el jugador se acerca a menos de 230
             if (distance <= 230) {
               pEnemy.isShooting = true;
             }
           }
 
-          // 🎬 EJECUCIÓN DE ACCIONES SEGÚN EL ESTADO ESTABLECIDO
           if (pEnemy.isShooting) {
-            // 🎯 ESTADO DISPARAR (Tu lógica original intacta)
             this.physics.moveToObject(
               pEnemy,
               this.player,
@@ -1258,7 +1212,6 @@ export default class MainScene extends Phaser.Scene {
             pEnemy.body.setVelocity(0, 0);
             pEnemy.shoot(this.player, this.enemyProjectiles, time);
           } else {
-            // 🏃‍♂️ ESTADO CAMINAR
             pEnemy.anims.play("purple_enemy_walk", true);
             this.physics.moveToObject(
               pEnemy,
@@ -1267,7 +1220,6 @@ export default class MainScene extends Phaser.Scene {
             );
           }
 
-          // Giro de pantalla para que te mire siempre de frente
           if (this.player.x < pEnemy.x) {
             pEnemy.setFlipX(true);
           } else {
@@ -1278,14 +1230,13 @@ export default class MainScene extends Phaser.Scene {
         }
       }
     });
-    // 🌌 Actualizar el rango de los proyectiles enemigos
     this.enemyProjectiles.getChildren().forEach((projectile) => {
       if (projectile.active) {
         projectile.update();
       }
     });
 
-    //  LÓGICA DE REGENERACIÓN
+    //  REGENERACIÓN
     if (time - this.lastDamageTime > 4000) {
       if (this.playerHP < 20 && time > this.nextRegenTime) {
         this.playerHP += 2;
@@ -1294,11 +1245,9 @@ export default class MainScene extends Phaser.Scene {
         this.hpText.setText("VIDA: " + this.playerHP);
         this.nextRegenTime = time + 1000;
 
-        // ✅ Usamos setTint para teñir el sprite de verde
         this.player.setTint(0x00ff00);
 
         this.time.delayedCall(100, () => {
-          // ✅ Usamos clearTint para quitarle el filtro verde y que vuelva a verse normal
           if (!this.isGameOver) this.player.clearTint();
         });
       }
@@ -1323,28 +1272,22 @@ export default class MainScene extends Phaser.Scene {
 
     // Cambiar de arma con la rueda del ratón
     this.input.on("wheel", (pointer, gameObjects, deltaX, deltaY, deltaZ) => {
-      // Ignorar si la tienda está abierta
       if (this.isShopOpen) return;
 
-      // 🛑 COOLDOWN: Si han pasado menos de 150 milisegundos desde el último giro, lo ignoramos
       if (this.time.now < this.lastWheelTime + 150) return;
 
-      // Actualizamos el tiempo del último giro
       this.lastWheelTime = this.time.now;
 
       if (this.weapons.length > 1) {
         if (deltaY > 0) {
-          // Rueda hacia ABAJO: Siguiente arma
           this.currentWeaponIndex =
             (this.currentWeaponIndex + 1) % this.weapons.length;
         } else if (deltaY < 0) {
-          // Rueda hacia ARRIBA: Arma anterior
           this.currentWeaponIndex =
             (this.currentWeaponIndex - 1 + this.weapons.length) %
             this.weapons.length;
         }
 
-        // Actualizar la interfaz solo una vez por giro válido
         if (this.updateAmmoDisplay) this.updateAmmoDisplay();
       }
     });
@@ -1363,11 +1306,12 @@ export default class MainScene extends Phaser.Scene {
         this.heartSound.play();
         this.isHeartbeatPlaying = true;
       }
-
-      let volumenObjetivo = 0.2; // Volumen cuando la vida esta en amarillo
+      // Volumen cuando la vida esta en amarillo
+      let volumenObjetivo = 0.2;
 
       if (this.playerHP <= 5) {
-        volumenObjetivo = 0.7; // Volumen cuando la vida esta en rojo
+        // Volumen cuando la vida esta en rojo
+        volumenObjetivo = 0.7;
       }
 
       if (this.heartSound.volume !== volumenObjetivo) {
@@ -1381,16 +1325,13 @@ export default class MainScene extends Phaser.Scene {
     }
 
     if (!this.isPaused && !this.isShopOpen && !this.isGameOver) {
-      this.ambientGrowlTimer += delta; // Sumamos el tiempo que pasa
+      this.ambientGrowlTimer += delta; 
 
-      // Si se cumple el tiempo (5-10 segundos)...
       if (this.ambientGrowlTimer >= this.nextGrowlTime) {
-        // ... y hay algún enemigo vivo en la pantalla
         if (this.enemies && this.enemies.countActive(true) > 0) {
-          this.sound.play("enemy_hit", { volume: 0.2 }); // Suena el grr
+          this.sound.play("enemy_hit", { volume: 0.2 }); 
         }
 
-        // Reiniciamos el contador y calculamos un nuevo tiempo aleatorio
         this.ambientGrowlTimer = 0;
         this.nextGrowlTime = Phaser.Math.Between(3000, 7000);
       }
@@ -1406,7 +1347,7 @@ export default class MainScene extends Phaser.Scene {
     const weapon = this.weapons[this.currentWeaponIndex];
     const upgrades = this.weaponUpgrades[weapon];
 
-    // 🛠️ 1. CADENCIA MEJORADA: Reducimos el cooldown un 20% por nivel de cadencia
+  
     let fireRate = 450;
     if (weapon === "UZI") fireRate = 200;
     if (weapon === "SHOTGUN") fireRate = 600;
@@ -1416,7 +1357,7 @@ export default class MainScene extends Phaser.Scene {
     let isShooting = false;
     let shootAngle = 0;
 
-    // --- DETECCIÓN DE DISPARO Y GIRO ---
+    // DETECCIÓN DE DISPARO Y GIRO 
     if (this.input.activePointer.isDown) {
       isShooting = true;
       shootAngle = Phaser.Math.Angle.Between(
@@ -1426,7 +1367,7 @@ export default class MainScene extends Phaser.Scene {
         this.input.activePointer.worldY,
       );
 
-      // 🔄 Girar el sprite según el ratón (usamos worldX por si la cámara se mueve)
+      //  Girar el sprite según el ratón
       if (this.input.activePointer.worldX < this.player.x) {
         this.player.setFlipX(true);
       } else if (this.input.activePointer.worldX > this.player.x) {
@@ -1444,7 +1385,7 @@ export default class MainScene extends Phaser.Scene {
         isShooting = true;
         shootAngle = Math.atan2(dirY, dirX);
 
-        // 🔄 Girar el sprite según las teclas de dirección
+        // Girar el sprite según las teclas de dirección
         if (dirX < 0) {
           this.player.setFlipX(true);
         } else if (dirX > 0) {
@@ -1453,7 +1394,7 @@ export default class MainScene extends Phaser.Scene {
       }
     }
 
-    // --- LÓGICA DE MUNICIÓN Y CREACIÓN DE BALAS ---
+    // LÓGICA DE MUNICIÓN Y CREACIÓN DE BALAS 
     if (isShooting && time > this.lastFiredTime) {
       if (weapon === "UZI") {
         if (this.ammoUzi <= 0) {
@@ -1494,7 +1435,6 @@ export default class MainScene extends Phaser.Scene {
       else if (weapon === "RAYGUN")
         this.sound.play("shoot_raygun", { volume: 0.4 });
 
-      // 🛠️ 2. RANGO MEJORADO: Añade +120 píxeles por nivel
       let dynamicRange = 500 + upgrades.range * 120;
 
       if (weapon === "SHOTGUN") {
@@ -1573,10 +1513,10 @@ export default class MainScene extends Phaser.Scene {
       let offsetX = 0;
       let offsetY = 0;
 
-      // 1. Pasamos el ángulo a grados para la dirección
+      // Pasamos el ángulo a grados para la dirección
       const angleDeg = Math.round(Phaser.Math.RadToDeg(angle));
 
-      // 2. Ajustamos el cañón según la dirección
+      // Ajustamos el cañón según la dirección
       if (angleDeg === 0) {
         offsetX = 30;
         offsetY = 8;
@@ -1621,14 +1561,13 @@ export default class MainScene extends Phaser.Scene {
     });
   }
 
-  // 🛠️ 3. MUNICIÓN MEJORADA: Incrementa el tamaño del cargador por nivel
   getMaxAmmo(weapon) {
     const upgrades = this.weaponUpgrades[weapon];
     const lvl = upgrades ? upgrades.ammo : 0;
-
-    if (weapon === "UZI") return 100 + lvl * 30; // +30 balas por nivel (Lvl3 = 190)
-    if (weapon === "SHOTGUN") return 30 + lvl * 5; // +5 balas por nivel  (Lvl3 = 45)
-    if (weapon === "RAYGUN") return 7 + lvl * 3; // +3 balas por nivel  (Lvl3 = 20)
+    // Mejora de la munición por nivel
+    if (weapon === "UZI") return 100 + lvl * 30; 
+    if (weapon === "SHOTGUN") return 30 + lvl * 5; 
+    if (weapon === "RAYGUN") return 7 + lvl * 3; 
     return "∞";
   }
 
@@ -1664,18 +1603,15 @@ export default class MainScene extends Phaser.Scene {
     this.cameras.main.shake(100, 0.005);
   }
 
-  // 📦 Función para comprobar si toca soltar caja
-  // 📦 Función para comprobar si toca soltar caja
+
   checkPowerupDrop(x, y) {
     this.killsToNextDrop--;
 
     if (this.killsToNextDrop <= 0) {
-      // 🌟 Creamos una estrella geométrica amarilla nativa en vez de la caja naranja
       let star = this.add.star(x, y, 5, 10, 20, 0xffd700);
       this.physics.add.existing(star);
       this.powerupBoxes.add(star);
 
-      // Animación 1: Para que flote de arriba a abajo
       this.tweens.add({
         targets: star,
         y: star.y - 10,
@@ -1684,7 +1620,6 @@ export default class MainScene extends Phaser.Scene {
         duration: 500,
       });
 
-      // Animación 2: Para que gire sobre su propio eje continuamente
       this.tweens.add({
         targets: star,
         angle: 360,
@@ -1692,51 +1627,43 @@ export default class MainScene extends Phaser.Scene {
         duration: 2000,
       });
 
-      // Modo PRUEBAS: reseteamos el contador a 10 otra vez
       this.killsToNextDrop = Phaser.Math.Between(20, 100);
     }
   }
 
-  // ✨ Función cuando el jugador recoge la caja
   collectPowerup(player, box) {
-    box.destroy(); // Desaparece la caja
+    box.destroy(); 
 
-    // Sorteamos el efecto (1, 2 o 3)
+    
     const randomEffect = Phaser.Math.Between(1, 3);
 
     switch (randomEffect) {
       case 1:
-        // 🔫 REPONER MUNICIÓN
-        // Cambia 'this.ammo' y 'this.maxAmmo' por el nombre de las variables que uses para la munición
+   
         this.ammoUzi = this.getMaxAmmo("UZI");
         this.ammoShotgun = this.getMaxAmmo("SHOTGUN");
         this.raygunAmmo = this.getMaxAmmo("RAYGUN");
-        this.updateAmmoDisplay(); // this.ammoText.setText(`Munición: ${this.ammo}`); // Descomenta si tienes texto de munición
+        this.updateAmmoDisplay(); 
         this.sound.play("reload", { volume: 0.5 });
-        console.log("¡PowerUp: Munición al máximo!");
         break;
 
       case 2:
-        // 💰 BONUS DE DINERO
         this.money += 350;
         this.moneyText.setText(`${this.money}$`);
         this.sound.play("buy_sound", { volume: 0.3 });
-        console.log("¡PowerUp: +300$!");
         break;
 
       case 3:
-        // ⚡ BONO DE VELOCIDAD
-        // Cambia 'this.playerSpeed' por la variable de velocidad de tu jugador
+       
         if (!this.isSpeedBoosted) {
-          this.isSpeedBoosted = true; // Guardamos la velocidad normal
-          this.playerCurrentSpeed = this.playerBaseSpeed * 2; // Multiplicamos x1.6
+          this.isSpeedBoosted = true; 
+          this.playerCurrentSpeed = this.playerBaseSpeed * 2;
           this.sound.play("speedUp", { volume: 0.3 });
 
           console.log("¡PowerUp: Velocidad x1.6 activada!");
 
-          // Cuenta atrás de 10 segundos
           this.time.delayedCall(8000, () => {
-            this.playerCurrentSpeed = this.playerBaseSpeed; // Restauramos
+            this.playerCurrentSpeed = this.playerBaseSpeed; 
             this.isSpeedBoosted = false;
             console.log("Fin del bono de velocidad.");
           });
@@ -1885,7 +1812,7 @@ export default class MainScene extends Phaser.Scene {
       })
       .setOrigin(0.5);
 
-    // Columnas de Referencia (Labels informativos superiores)
+    // Columnas de Referencia 
     const h1 = this.add
       .text(130, 120, "ESTADO ARMA", {
         fontSize: "14px",
@@ -1917,7 +1844,6 @@ export default class MainScene extends Phaser.Scene {
 
     this.shopMenu.add([title, shopMoneyText, h1, h2, h3, h4]);
 
-    // Estilos base rápidos
     const activeStyle = {
       fontSize: "13px",
       fill: "#fff",
@@ -1943,9 +1869,7 @@ export default class MainScene extends Phaser.Scene {
       padding: { x: 3, y: 6 },
     };
 
-    // -----------------------------------------------------------------
-    // FILA 1: PISTOLA (Y = 170)
-    // -----------------------------------------------------------------
+    // PISTOLA
     const pUp = this.weaponUpgrades.PISTOLA;
     const pSpeedCost = 200;
     const pRangeCost = 150;
@@ -1988,9 +1912,7 @@ export default class MainScene extends Phaser.Scene {
       .setOrigin(0.5)
       .setInteractive({ useHandCursor: pUp.range < 3 });
 
-    // -----------------------------------------------------------------
-    // FILA 2: MINI UZI (Y = 240)
-    // -----------------------------------------------------------------
+    //  MINI UZI
     const uUp = this.weaponUpgrades.UZI;
     const uWeaponCost = 200;
     const uAmmoCost = 250;
@@ -2069,9 +1991,7 @@ export default class MainScene extends Phaser.Scene {
       .setOrigin(0.5)
       .setInteractive({ useHandCursor: this.hasUzi && uUp.range < 3 });
 
-    // -----------------------------------------------------------------
-    // FILA 3: SHOTGUN (Y = 310)
-    // -----------------------------------------------------------------
+    // SHOTGUN
     const sUp = this.weaponUpgrades.SHOTGUN;
     const sWeaponCost = 300;
     const sAmmoCost = 300;
@@ -2150,9 +2070,7 @@ export default class MainScene extends Phaser.Scene {
       .setOrigin(0.5)
       .setInteractive({ useHandCursor: this.hasShotgun && sUp.range < 3 });
 
-    // -----------------------------------------------------------------
-    // FILA 4: RAYGUN (Y = 380)
-    // -----------------------------------------------------------------
+    // RAYGUN
     const rUp = this.weaponUpgrades.RAYGUN;
     const hasRaygun = this.weapons.includes("RAYGUN");
     const rWeaponCost = 500;
@@ -2232,7 +2150,7 @@ export default class MainScene extends Phaser.Scene {
       .setOrigin(0.5)
       .setInteractive({ useHandCursor: hasRaygun && rUp.range < 3 });
 
-    // Botones de salida e Interfaz inferior (Munición total fijada a $10 según tu condicional)
+    // Botones de salida e Interfaz inferior 
     const isAmmoFull =
       this.ammoUzi >= this.getMaxAmmo("UZI") &&
       this.ammoShotgun >= this.getMaxAmmo("SHOTGUN") &&
@@ -2292,7 +2210,7 @@ export default class MainScene extends Phaser.Scene {
   }
 
   gameOver() {
-    // 1. 🛑 PARAR EL JUEGO Y SONIDOS PREVIOS
+    // PARAR EL JUEGO Y SONIDOS PREVIOS
     this.sound.stopAll();
 
     if (this.heartSound) {
@@ -2304,24 +2222,20 @@ export default class MainScene extends Phaser.Scene {
     this.physics.pause();
     this.isInvulnerable = false;
 
-    // 2. 💥 EFECTOS INMEDIATOS DE MUERTE (Sonido corto y caída)
-    this.sound.play("game_over", { volume: 0.2 }); // Solo el efecto de sonido cortito
+    this.sound.play("game_over", { volume: 0.2 }); 
     this.cameras.main.shake(300, 0.01);
 
     this.player.clearTint();
-    this.player.setTexture("player_die_strip"); // Cambiamos a la tira de muerte
-    this.player.anims.play("morir_anim"); // Empieza a caer
+    this.player.setTexture("player_die_strip"); 
+    this.player.anims.play("morir_anim"); 
 
-    // 3. ⏳ ESPERAR A QUE TERMINE LA ANIMACIÓN DE CAÍDA
-    // Con 'once' nos aseguramos de que esto se ejecute SOLO CUANDO el soldado termine de caer
+
     this.player.once("animationcomplete-morir_anim", () => {
       this.anims.pauseAll();
-      this.player.setFrame(4); // Se queda tendido en el último frame
+      this.player.setFrame(4); 
 
-      // 4. 🎵 ENTRA LA MÚSICA DE GAME OVER EN BUCLE
       this.sound.play("game_over_music", { volume: 0.6, loop: true });
 
-      // 5. 🖥️ APARECE LA INTERFAZ DE USUARIO (MENÚS Y TEXTOS)
       const x = this.cameras.main.worldView.centerX;
       const y = this.cameras.main.worldView.centerY;
 
@@ -2381,7 +2295,6 @@ export default class MainScene extends Phaser.Scene {
 
       // Lógica de iluminación de los botones al pasar el ratón
       [restartBtn, menuBtn].forEach((btn) => {
-        // Corregido el "#ff" por "#ff0" (amarillo) para que cambie de color al pasar por encima
         btn.on("pointerover", () => btn.setStyle({ fill: "#ff0" }));
         btn.on("pointerout", () => {
           const originalColor = btn === restartBtn ? "#0f0" : "#fff";
