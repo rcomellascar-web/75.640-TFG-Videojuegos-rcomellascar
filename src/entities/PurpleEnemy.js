@@ -37,6 +37,7 @@ export default class PurpleEnemy extends Phaser.GameObjects.Sprite {
     if (this.body) {
         this.body.reset(x, y);
         this.body.setImmovable(false);
+        this.body.enable = true;
     }
     this.setActive(true);
     this.setVisible(true);
@@ -99,7 +100,10 @@ export default class PurpleEnemy extends Phaser.GameObjects.Sprite {
   die() {
     this.setActive(false);
     this.setVisible(false);
-    if (this.body) this.body.stop();
+    if (this.body){
+      this.body.stop();
+      this.body.enable = false;
+    } 
   }
 
  preUpdate(time, delta) {
