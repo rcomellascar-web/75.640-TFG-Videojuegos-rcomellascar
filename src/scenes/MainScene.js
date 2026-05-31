@@ -242,7 +242,7 @@ export default class MainScene extends Phaser.Scene {
     this.enemiesToSpawn = 8;
     this.playerBaseSpeed = 250;
     this.playerCurrentSpeed = 250;
-    this.money = 100000;
+    this.money = 0;
     this.hasUzi = false;
     this.hasShotgun = false;
     this.weapons = ["PISTOLA"];
