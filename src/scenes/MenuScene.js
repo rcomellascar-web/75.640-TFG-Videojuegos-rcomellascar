@@ -35,7 +35,7 @@ export default class MenuScene extends Phaser.Scene {
         });
 
         instrBtn.on('pointerdown', () => {
-            alert('Instrucciones: \n- Moverse: WASD \n- Disparar: Flechas \n- Cambiar de arma: Punto y coma \n- Sobrevive al cuadrado rojo.');
+            alert('Instrucciones: \n- Moverse: WASD \n- Disparar: Flechas o Click \n- Cambiar de arma: Punto y coma \n- Abrir la tienda: B. \n- Sobrevive a los diferentes enemigos.');
         });
 
         startBtn.on('pointerover', () => startBtn.setStyle({ fill: '#ff0' }));
