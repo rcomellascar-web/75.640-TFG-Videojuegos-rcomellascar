@@ -254,7 +254,7 @@ export default class MainScene extends Phaser.Scene {
     this.ammoUzi = 100;
     this.ammoShotgun = 30;
     this.lastJammedTime = 0;
-    this.killsToNextDrop = Phaser.Math.Between(20, 100);
+    this.killsToNextDrop =Phaser.Math.Between(20, 100);
     this.raygunAmmo = 8;
     this.ammoCost = 450;
     this.weaponUpgrades = {
@@ -1798,9 +1798,9 @@ export default class MainScene extends Phaser.Scene {
 
     // Cabecera del Menú
     const title = this.add
-      .text(400, 35, "ARMERÍA GENERAL", {
+      .text(400, 35, "Tienda", {
         fontSize: "36px",
-        fill: "#00ffff",
+        fill: "#5982fb",
         fontStyle: "bold",
       })
       .setOrigin(0.5);
